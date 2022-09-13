@@ -2,9 +2,9 @@ clc; clear; close all;
 dirName = fileparts(matlab.desktop.editor.getActiveFilename);
 addpath(dirName)
 % Copied from Andrea's folder
-addpath(genpath('C:\Septiembre-Octubre\Scripts_Andrea\buzcode'))
-addpath(genpath('C:\Septiembre-Octubre\Scripts_Andrea\scripts'))
-addpath(fullfile('C:\Septiembre-Octubre\Scripts_Andrea\scripts proyecto ripples'))
+addpath(genpath('C:\Septiembre-Octubre\ScriptsAndrea\buzcode'))
+addpath(genpath('C:\Septiembre-Octubre\ScriptsAndrea\scripts'))
+addpath(fullfile('C:\Septiembre-Octubre\ScriptsAndrea\scripts proyecto ripples'))
 
 %  -------------
 %  | LOAD INFO |
@@ -24,7 +24,7 @@ dirSessions = {
 % Which model made de predictions
 ModelType='CNN2D';
 %% 
-for isess = 1:length(dirSessions)
+for isess = 4:4%length(dirSessions)
     dirSession = dirSessions{isess};
     
     fprintf('\n\n  > DATA: %s\n',dirSession);
@@ -52,8 +52,7 @@ for isess = 1:length(dirSessions)
     LFP = double(LFPraw);
     % zscore LFP
     LFP = (LFP-mean(LFP,1)) ./ std(LFP);
-end
-%%    % An array with the th used in the test is created 
+%    % An array with the th used in the test is created 
     thArray=[];
      dirTest=fullfile(dirData,'events',ModelType)
     filePattern = fullfile(dirTest, '*.txt'); 
@@ -63,24 +62,22 @@ end
         thStr=extractBetween(Results(i).name,'th','.txt');
         thArray(end+1)=str2double(thStr{1,1});
     end
-%%
-for  i=1:4
-
+    
     % -- COMPUTE AUTOMATIC EVENTS WITH COMMON THRESHOLD ----
-
+    % Ground truth?
     [true_events, true_shanks] = read_csv_events(dirData, fs);
     true_shank = unique(true_shanks);
-
-    for thr = 0.1:0.1:0.9
-        fprintf('thresh %.1f...', thr);
-
-        % File name
-        file_name = fullfile(dirData, 'events', ['events_cnn32_thr', num2str(thr)]);
-
+     
+    for i_th =1:length(thArray)  %thArray extracted from files results
+        thr=thArray(i_th);
+        fprintf('Threshold %.2f...', thr);
+        % File name. Results contains the information of the file, not the
+        % file itself
+        file_name = fullfile(Results(i_th).folder,Results(i_th).name)
         % Read
-        if exist([file_name '.txt'], 'file')
+        if exist(file_name, 'file')
             fprintf(' loading...');
-            pred_events = read_all_events([file_name '.txt'], 'exact_match', 1);
+            pred_events = read_all_events(file_name , 'exact_match', 1);
             
             % Merge nearby detections
             auto_events = pred_events(1,:);
@@ -91,15 +88,13 @@ for  i=1:4
                     auto_events = [auto_events; pred_events(ii,:)];
                 end
             end
-            
-
         % Compute and save
         else
-            warning('There is no file of detections')
+            warning('There is no file of detections with such name')
             continue
         end
 
-        fprintf(' compute metrics...\n');
+        fprintf('Computing metrics: \n');
 
         % Check which ones are TP or FP
         [precision, recall, F1, TP, FN, IOU] = compute_precision_recall_events({auto_events}, true_events);
@@ -117,15 +112,16 @@ for  i=1:4
         metrics.TP = TP{1};
         metrics.FN = FN;
         metrics.properties = properties;
-        save([file_name '_metrics_win.mat'], 'metrics', 'properties')
+        
+        save([file_name(1:end-4) '_metrics_win.mat'], 'metrics', 'properties')
 
         clear properties metrics
 
     end
 
+
+
 end
-
-
 
 
 
