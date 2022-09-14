@@ -87,14 +87,14 @@ for isess = 4:4%length(dirSessions)
 end
 % It is saved in the main directory
 if ~exist(SavePath, 'dir')
-       mkdir(SavePath);
+       mkdir(SaveP)
 end
 save(fullfile(SavePath,'all_properties.mat'), 'pred_prop', 'true_prop', 'detectors', 'thresholds', 'dirSessions')
 
 %%
 
 % Load
-load(fullfile(SavePath,'all_properties.mat'))
+load('all_properties.mat')
 TPFN_names = {'TP', 'FP', 'FN', 'pred', 'true'};
 
 prop_sess = {};
@@ -169,5 +169,5 @@ for iTPFN = 1:length(TPFN_names)
     end
 end
 
-save(fullfile(SavePath,'all_properties_sess.mat'), 'prop_sess', 'TPFN_names', 'detectors', 'thresholds', 'dirSessions')
+save('all_properties_sess.mat', 'prop_sess', 'TPFN_names', 'detectors', 'thresholds', 'dirSessions')
 

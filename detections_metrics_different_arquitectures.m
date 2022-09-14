@@ -53,6 +53,9 @@ for isess = 4:4%length(dirSessions)
     % zscore LFP
     LFP = (LFP-mean(LFP,1)) ./ std(LFP);
 %    % An array with the th used in the test is created 
+end
+%%
+for i=1
     thArray=[];
      dirTest=fullfile(dirData,'events',ModelType)
     filePattern = fullfile(dirTest, '*.txt'); 
