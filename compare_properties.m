@@ -6,14 +6,20 @@ cd(dirName)
 %  | LOAD INFO |
 %  -------------
 
-load('all_properties.mat')
+dirProject='C:\Septiembre-Octubre\Ripple-Properties';
+% Location of the all_properties.mat to be analized
+dirTest='2022-09-14';
+dirProperties=fullfile(dirProject,dirTest);
+load(fullfile(dirProperties,'all_properties.mat'));
 
 % What to plot
 prop_names = {'frequency', 'power', 'duration', 'SRI', 'entropy'};
 n_props = length(prop_names);
 n_detectors = length(detectors);
 colors = makeColorMap([.2 .4 .7], [.7 .4 .8], [.8 .1 .4], 9);
-
+if ~exist(fullfile(dirProperties, 'images'), 'dir')
+        mkdir(fullfile(dirProperties, 'images'))
+end
 %% --- All detections ----
 
 figure('pos', [100 100 1300 1100])
@@ -38,11 +44,13 @@ for idet = 1:n_detectors
             ic95_prop(:,ithr) = [prctile(prop_values{ithr},25); prctile(prop_values{ithr},75)];
             %scatter(thresholds{idet}(ithr) + (rand(1,length(prop_values{ithr}))-0.5)*dthresh, prop_values{ithr}, 12, ...
             %    'markeredgecolor', 'none', 'markerfacecolor', [1 1 1]*0.8, 'markerfacealpha', 0.01)
+            % Added 
+            %plot(thresholds{idet}(ithr), prop_values{ithr}, '.', 'color', [.5 .5 .5])
         end
         plot(thresholds{idet}, median_prop, 'k')
         plot([thresholds{idet}; thresholds{idet}], [ic95_prop(1,:); ic95_prop(2,:)], 'k')
         
-        %groupStats(prop_values, [], 'inAxis', true, 'color', colors(1:n_thrs,:))
+        % groupStats(prop_values, [], 'inAxis', true, 'color', colors(1:n_thrs,:))
         
         
         % Axis
@@ -63,7 +71,7 @@ for idet = 1:n_detectors
         end
     end    
 end
-saveas(gcf, 'images/compare_properties_alldetections.png')
+saveas(gcf,fullfile(dirProperties, 'images','compare_properties_alldetections.png'))
 
 
 
@@ -117,7 +125,7 @@ for idet = 1:n_detectors
         end
     end    
 end
-saveas(gcf, 'images/compare_properties_TPs.png')
+saveas(gcf,fullfile(dirProperties, 'images','compare_properties_TPs.png'))
 
 
 
@@ -171,8 +179,7 @@ for idet = 1:n_detectors
         end
     end    
 end
-saveas(gcf, 'images/compare_properties_FPs.png')
-
+saveas(gcf,fullfile(dirProperties, 'images','compare_properties_FPs.png'))
 
 
 
@@ -226,4 +233,4 @@ for idet = 1:n_detectors
         end
     end    
 end
-saveas(gcf, 'images/compare_properties_FNs.png')
+saveas(gcf,fullfile(dirProperties, 'images','compare_properties_FNs.png'))

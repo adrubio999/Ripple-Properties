@@ -57,7 +57,7 @@ for idet = 1:length(detectors)
     true_prop.(detectors{idet}) = cell(1,length(thresholds{idet}));
 end
 %% for loop iterating over the sessions
-for isess = 4:4%length(dirSessions)
+for isess = 1:length(dirSessions)
     dirSession = dirSessions{isess};
     
     fprintf('\n\n  > DATA: %s\n',dirSession);
