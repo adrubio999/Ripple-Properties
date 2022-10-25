@@ -18,7 +18,7 @@ statistics = {'mean', 'median'};
 n_props = length(prop_names);
 n_detectors = length(detectors);
 
-%% Threshold curves
+%% Threshold curves, no stats (no call to group stats)
 
 
 for iTPFN = 1:length(TPFN_names)
@@ -38,7 +38,7 @@ for iTPFN = 1:length(TPFN_names)
                 
                 % Plot
                 subplot(n_detectors, n_props, (idet-1)*n_props + iprop), hold on
-                %dthresh = mean(diff(thresholds{idet}))/n_thrs;
+                dthresh = mean(diff(thresholds{idet}))/n_thrs;
                 
                 % Gather all properties
                 % n_thrs = length(thresholds{idet}); % This is moved to the
@@ -52,16 +52,20 @@ for iTPFN = 1:length(TPFN_names)
                     prop_values{ithr} = prop_sess.(TPFN).(stat).(detector){ithr}.(property);
                     median_prop(ithr) = nanmedian(prop_values{ithr});
                     ic95_prop(:,ithr) = [prctile(prop_values{ithr},25); prctile(prop_values{ithr},75)];
-                    plot(thresholds{idet}(ithr), prop_values{ithr}, '.', 'color', [.5 .5 .5])
+                    % Si comento los plots de los puntos individuales igual
+                    % no hay problema con que se desplacen los ejes del
+                    % boxplot, y salen mas bonitas las gráficas
+                    % plot(thresholds{idet}(ithr), prop_values{ithr}, '.', 'color', [.5 .5 .5])
                     % No entiendo el papel de este random que se suma aquí.
-                    % Original: plot(thresholds{idet}(ithr) + (rand(1,length(prop_values{ithr}))-0.5)*dthresh, prop_values{ithr}, '.', 'color', [.5 .5 .5])
+                    % Original: 
+                    plot(thresholds{idet}(ithr) + (rand(1,length(prop_values{ithr}))-0.5)*dthresh, prop_values{ithr}, '.', 'color', [.5 .5 .5])
 
                 end
                 
                 plot(thresholds{idet}, median_prop, 'k')
                 plot([thresholds{idet}; thresholds{idet}], [ic95_prop(1,:); ic95_prop(2,:)], 'k')
                 
-                groupStats(prop_values, [], 'inAxis', true, 'color', colors(1:n_thrs,:))
+                %groupStats(prop_values, [], 'inAxis', true, 'color', colors(1:n_thrs,:),'sigStar', false)
                 % The points are moved with respect to the plot boxes. Ask
                 % andrea
                 
@@ -90,7 +94,7 @@ end
 
 %% Threshold curves + stats
 
-colors = makeColorMap([.2 .4 .7], [.7 .4 .8], [.8 .1 .4], 9);
+% colors = makeColorMap([.2 .4 .7], [.7 .4 .8], [.8 .1 .4], 9);
 for iTPFN = 1:length(TPFN_names{iTPFN})
     TPFN = TPFN_names{iTPFN};
 
@@ -101,6 +105,8 @@ for iTPFN = 1:length(TPFN_names{iTPFN})
         sgtitle([TPFN ' detections - ' stat ' per session'])
         for idet = 1:n_detectors
             detector = detectors{idet};
+            n_thrs= length(thresholds{idet});
+            colors = makeColorMap([.2 .4 .7], [.7 .4 .8], [.8 .1 .4], n_thrs);
             for iprop = 1:n_props
                 property = prop_names{iprop};
                 
@@ -118,7 +124,7 @@ for iTPFN = 1:length(TPFN_names{iTPFN})
                     median_prop(ithr) = nanmedian(prop_values{ithr});
                     ic95_prop(:,ithr) = [prctile(prop_values{ithr},25); prctile(prop_values{ithr},75)];
                 end                
-                groupStats(prop_values, [], 'inAxis', true, 'color', colors(1:n_thrs,:))
+                groupStats(prop_values, [], 'inAxis', true, 'color', colors(1:n_thrs,:),'sigStar',false)
                 
                 
                 % Axis
@@ -172,7 +178,7 @@ for iTPFN = 1:length(TPFN_names)
                 end
                 plot(idet + (rand(1,length(prop_values{idet}))-0.5)*0.3, prop_values{idet}, '.k')
             end 
-            groupStats(prop_values, [], 'inAxis', true, 'color', colors(1:n_thrs,:), 'plotData', true)
+            groupStats(prop_values, [], 'inAxis', true, 'color', colors(1:3,:), 'plotData', true,'sigStar',false)
 
 
             % Axis

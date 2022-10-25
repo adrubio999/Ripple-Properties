@@ -13,25 +13,38 @@ addpath(fullfile('C:\Septiembre-Octubre\ScriptsAndrea\scripts proyecto ripples')
 dirAndrea = 'C:\ProyectoInicial\Datos';
 
 % Sessions
-dirSessions = {
+dirSessions = {'Kilosort/Dlx1/2021-02-12_12-46-54', ...
     'Kilosort/Thy7/2020-11-11_16-05-00', ...
-    'Kilosort/Thy1GCam1/2020-12-18_14-40-16', ...
-    'Kilosort/Dlx1/2021-02-12_12-46-54', ...
-    'Kilosort/Thy9/2021-03-16_12-10-32', ...
     'Kilosort/PV6/2021-04-19_14-02-31', ...
-    'Kilosort/PV7xChR2/2021-05-18_13-24-33'    
-};
-
+    'Kilosort/PV7xChR2/2021-05-18_13-24-33',...
+    'Kilosort/Thy9/2021-03-16_12-10-32', ...
+    'Kilosort/Thy1GCam1/2020-12-18_14-40-16', ...
+    'Kilosort/Thy7/2020-11-11_16-21-15', ...        % 6 
+    'Kilosort/Thy7/2020-11-11_16-35-43', ...        % 7
+    'Kilosort/Thy1GCam1/2020-12-18_13-16-03', ...   % 8
+    'Kilosort/Thy1GCam1/2020-12-18_13-32-27', ...   % 9
+    'Kilosort/Thy1GCam1/2020-12-18_14-56-54', ...   % 10
+    'Kilosort/Thy1GCam1/2020-12-21_14-58-51', ...   % 11
+    'Kilosort/Thy1GCam1/2020-12-21_15-11-32', ...   % 12
+    'Kilosort/Thy1GCam1/2020-12-21_15-26-01', ...   % 13
+    'Kilosort/Calb20/2021-01-22_13-08-20', ...      % 14
+    'Kilosort/Dlx1/2021-02-12_12-24-56', ...        % 15
+    'Kilosort/Thy9/2021-03-16_14-31-51', ...     % 16
+    'Kilosort/PV7xChR2/2021-05-18_13-08-23', ... % 17
+    'Kilosort/PV7xChR2/2021-05-18_13-48-31', ... % 18
+    'Kilosort/Thy10/2021-06-01_13-28-27', ...    % 19
+    'Kilosort/Thy10/2021-06-15_15-28-56', ...    % 20
+    };
 % Filters to test
 %detectors = {'butter', 'besselfir', 'cnn32'};
 %Where to save the generated files inside Ripple-Properties
-SavePath='2022-09-14';
+SavePath='2022-10-14';
 %Detectors will contain the different models validated inside
 %session\events\[Model]
-detectors = {'CNN2D'};
+detectors = {'CNN2D','CNN1D','XGBOOST','SVM'};
 %thresholds = {2:8, 2:8, 0.1:0.1:0.9};
 % This section extracts the length of the threshold array
-dirData = fullfile(dirAndrea, dirSessions{4});
+dirData = fullfile(dirAndrea, dirSessions{1});
 
 % Properties of all ripples 
 pred_prop = {};
@@ -57,7 +70,7 @@ for idet = 1:length(detectors)
     true_prop.(detectors{idet}) = cell(1,length(thresholds{idet}));
 end
 %% for loop iterating over the sessions
-for isess = 1:length(dirSessions)
+for isess = 1:1%length(dirSessions)
     dirSession = dirSessions{isess};
     
     fprintf('\n\n  > DATA: %s\n',dirSession);
@@ -65,7 +78,7 @@ for isess = 1:length(dirSessions)
     for idet = 1:length(detectors)        
         detector = detectors{idet};
         disp(detector);
-        dirData = fullfile(dirAndrea, dirSession,'events',detector);
+        dirData = fullfile(dirAndrea, dirSession,'events','Best');
       
         filePattern = fullfile(dirTest, '*.txt'); 
         Results = dir(filePattern);              %Results contains a structure with the names of the folder      
