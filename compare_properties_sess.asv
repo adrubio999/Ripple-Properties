@@ -37,7 +37,7 @@ for iTPFN = 1:length(TPFN_names)
                 property = prop_names{iprop};
                 
                 % Plot
-                subplot(n_props, n_detectors, ((iprop-1)*n_detectors + idet)), hold on
+                subplot(n_props, n_det, ((iprop-1)*n_detectors + idet), hold on)
                 dthresh = mean(diff(thresholds{idet}))/n_thrs;
                 
                 % Gather all properties
@@ -73,8 +73,8 @@ for iTPFN = 1:length(TPFN_names)
                 
                 
                 % Axis
-                if iprop==1, title(detector), end
-                if idet==1, ylabel(property), end
+                title(property)
+                if iprop==1, ylabel(detector), end
                 if iprop==n_props, xlabel('Threshold'), end
                 switch property
                     case 'frequency'
@@ -122,9 +122,6 @@ for iTPFN = 1:length(TPFN_names{iTPFN})
                 median_prop = nan(1,n_thrs);
                 ic95_prop = nan(2,n_thrs);
                 for ithr = 1:n_thrs
-                    if isempty(prop_sess.(TPFN).(stat).(detector){ithr})
-                        continue
-                    end
                     prop_values{ithr} = prop_sess.(TPFN).(stat).(detector){ithr}.(property);
                     median_prop(ithr) = nanmedian(prop_values{ithr});
                     ic95_prop(:,ithr) = [prctile(prop_values{ithr},25); prctile(prop_values{ithr},75)];

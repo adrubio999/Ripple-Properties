@@ -38,13 +38,13 @@ dirSessions = {'Kilosort/Dlx1/2021-02-12_12-46-54', ...
 % Filters to test
 %detectors = {'butter', 'besselfir', 'cnn32'};
 %Where to save the generated files inside Ripple-Properties
-SavePath='2022-10-14';
+SavePath='Paper';
 %Detectors will contain the different models validated inside
 %session\events\[Model]
-detectors = {'CNN2D','CNN1D','XGBOOST','SVM'};
+detectors = {'XGBOOST','SVM','LSTM','CNN2D','CNN1D'};
 %thresholds = {2:8, 2:8, 0.1:0.1:0.9};
 % This section extracts the length of the threshold array
-dirData = fullfile(dirAndrea, dirSessions{1});
+dirData = fullfile(dirAndrea, dirSessions{1},'events','Best');
 
 % Properties of all ripples 
 pred_prop = {};
@@ -52,41 +52,43 @@ true_prop = {};
 % This for loop extracts the arrays used in the test of the different
 % arquitectures, which dont have to be the same across models
  thresholds={} ;  % Working with cells
+ 
 for idet = 1:length(detectors) 
     th_arr=[];
-    dirTest=fullfile(dirData,'events',detectors{idet});
-    filePattern = fullfile(dirTest, '*.txt')
+    % dirTest=fullfile(dirData,'events',detectors{idet});
+    filePattern = fullfile(strcat(dirData,'\',detectors{idet},'*','.txt'))
     Results = dir(filePattern);
     for i=1:length(Results)
         %Extracts the threshold and appends it to an array 
-        thStr=extractBetween(Results(i).name,'th','.txt');
+        thStr=extractBetween(Results(i).name,'th_','.txt');
         th_arr(end+1)=str2double(thStr{1,1});
     end
     thresholds(end+1)={th_arr};
 end
+% {'XGBOOST','SVM','LSTM','CNN2D','CNN1D'}
+thresholds={linspace(0,0.9,10),linspace(0,0.95,20),linspace(0,0.85,17),linspace(0,0.95,20),linspace(0,0.95,20)}
 % Cell inicialzation
 for idet = 1:length(detectors)
     pred_prop.(detectors{idet}) = cell(1,length(thresholds{idet}));
     true_prop.(detectors{idet}) = cell(1,length(thresholds{idet}));
 end
 %% for loop iterating over the sessions
-for isess = 1:1%length(dirSessions)
+for isess = 1:length(dirSessions)
     dirSession = dirSessions{isess};
     
-    fprintf('\n\n  > DATA: %s\n',dirSession);
+    fprintf('\n\n  >Session number %d DATA: %s\n',isess-1,dirSession);
     % for loop iterating over the arquitectures
     for idet = 1:length(detectors)        
         detector = detectors{idet};
         disp(detector);
-        dirData = fullfile(dirAndrea, dirSession,'events','Best');
-      
-        filePattern = fullfile(dirTest, '*.txt'); 
+        filePattern = fullfile(strcat(dirData,'\',detectors{idet},'*','.mat'))
         Results = dir(filePattern);              %Results contains a structure with the names of the folder      
         
-        for ithr = 1:length(thresholds{idet})
+        for ithr = 1:length(Results)
+            
             thr = thresholds{idet}(ithr);
-            disp(fullfile(dirData, strcat(Results(ithr).name(1:end-4),'_metrics_win.mat')))
-            load(fullfile(dirData, strcat(Results(ithr).name(1:end-4),'_metrics_win.mat')), 'properties') 
+            disp(fullfile(dirData, Results(ithr).name))
+            load(fullfile(dirData, Results(ithr).name), 'properties') 
             % PRED: append to properties structure
             append_table = properties.detection(:,[1:6 8]);
             append_table = [append_table table(isess*ones(height(properties.detection),1), 'VariableNames', {'session'})];
@@ -137,6 +139,10 @@ for iTPFN = 1:length(TPFN_names)
                 otherwise
                     tbl = pred_prop.(detector){ithr};
             end
+            if isempty(tbl)
+                continue
+            end
+            
             prop_names = fieldnames(tbl);
             prop_sess.(TPFN).mean.(detector){ithr} = {};
             prop_sess.(TPFN).median.(detector){ithr} = {};

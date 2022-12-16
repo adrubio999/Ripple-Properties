@@ -37,9 +37,10 @@ dirSessions = {
     'Kilosort/Thy10/2021-06-15_15-28-56', ...    % 20
 };
 % Which model made de predictions
-ModelTypes={'CNN1D','SVM','CNN2D','XGBOOST'};
+ModelTypes={'LSTM','XGBOOST','SVM','CNN2D','CNN1D'};
 %% 
-for isess = 1:1%length(dirSessions)
+for isess = 1:length(dirSessions)
+    fprintf('Computing properties of session %d',isess)
     dirSession = dirSessions{isess};
     fprintf('\n\n  > DATA: %s\n',dirSession);
     dirData = fullfile(dirAndrea, dirSession)
@@ -67,13 +68,11 @@ for isess = 1:1%length(dirSessions)
 %    % An array with the th used in the test is created 
     
     dirTest=fullfile(dirData,'events','Best');
-%%
         for iModeltype=1:length(ModelTypes)
             thArray=[];
             
             ModelType=ModelTypes{iModeltype};
-            disp(ModelType)
-            filePattern = fullfile(dirTest, strcat(ModelType,'*.txt') ); 
+            filePattern = fullfile(dirTest, strcat(ModelType,'_','*.txt') ); 
             Results = dir(filePattern);
             for i=1:length(Results)
                 %Extracts the threshold and appends it to an array 
@@ -88,6 +87,7 @@ for isess = 1:1%length(dirSessions)
 
             for i_th =1:length(thArray)  %thArray extracted from files results
                 thr=thArray(i_th);
+                disp(ModelType);
                 fprintf('Threshold %.2f...', thr);
                 % File name. Results contains the information of the file, not the
                 % file itself
