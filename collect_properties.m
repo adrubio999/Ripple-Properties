@@ -60,13 +60,12 @@ for idet = 1:length(detectors)
     Results = dir(filePattern);
     for i=1:length(Results)
         %Extracts the threshold and appends it to an array 
-        thStr=extractBetween(Results(i).name,'th_','.txt');
+        thStr=extractBetween(Results(i).name,'th','.txt');
         th_arr(end+1)=str2double(thStr{1,1});
     end
     thresholds(end+1)={th_arr};
 end
 % {'XGBOOST','SVM','LSTM','CNN2D','CNN1D'}
-thresholds={linspace(0,0.9,10),linspace(0,0.95,20),linspace(0,0.85,17),linspace(0,0.95,20),linspace(0,0.95,20)}
 % Cell inicialzation
 for idet = 1:length(detectors)
     pred_prop.(detectors{idet}) = cell(1,length(thresholds{idet}));
@@ -75,7 +74,8 @@ end
 %% for loop iterating over the sessions
 for isess = 1:length(dirSessions)
     dirSession = dirSessions{isess};
-    
+    dirData = fullfile(dirAndrea, dirSession,'events','Best');
+
     fprintf('\n\n  >Session number %d DATA: %s\n',isess-1,dirSession);
     % for loop iterating over the arquitectures
     for idet = 1:length(detectors)        

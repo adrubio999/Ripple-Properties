@@ -37,7 +37,8 @@ dirSessions = {
     'Kilosort/Thy10/2021-06-15_15-28-56', ...    % 20
 };
 % Which model made de predictions
-ModelTypes={'LSTM','XGBOOST','SVM','CNN2D','CNN1D'};
+ModelTypes={'SVM'};%{'XGBOOST','SVM','LSTM','CNN2D','CNN1D'};
+
 %% 
 for isess = 1:length(dirSessions)
     fprintf('Computing properties of session %d',isess)
@@ -76,7 +77,7 @@ for isess = 1:length(dirSessions)
             Results = dir(filePattern);
             for i=1:length(Results)
                 %Extracts the threshold and appends it to an array 
-                thStr=extractBetween(Results(i).name,'th_','.txt');
+                thStr=extractBetween(Results(i).name,'_th','.txt');
                 thArray(end+1)=str2double(thStr{1,1});
             end
 
